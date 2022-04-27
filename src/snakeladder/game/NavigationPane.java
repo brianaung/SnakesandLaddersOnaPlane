@@ -85,6 +85,7 @@ public class NavigationPane extends GameGrid
   // attributes added
   private int numberOfDice;
   private int dieIndex = 1;  // curr number of die each player is rolling
+  private int nMoves = 0;
 
   NavigationPane(Properties properties)
   {
@@ -291,14 +292,6 @@ public class NavigationPane extends GameGrid
       String result = gp.getPuppet().getPuppetName() + " - pos: " + currentIndex;
       showResult(result);
 
-      // do not switch to the next puppet until the player has rolled the dice the specified amount of time
-      if (dieIndex == numberOfDice) {
-        gp.switchToNextPuppet();
-        dieIndex = 1;  // reset
-      } else {
-        dieIndex++;
-      }
-
       // System.out.println("current puppet - auto: " + gp.getPuppet().getPuppetName() + "  " + gp.getPuppet().isAuto() );
 
       if (isAuto) {
@@ -316,7 +309,16 @@ public class NavigationPane extends GameGrid
     showStatus("Moving...");
     showPips("Pips: " + nb);
     showScore("# Rolls: " + (++nbRolls));
-    gp.getPuppet().go(nb);
+    nMoves+=nb;
+    if (dieIndex == numberOfDice) {
+      gp.getPuppet().go(nMoves);
+      gp.switchToNextPuppet();
+      nMoves = 0;
+      dieIndex = 1;  // reset
+    } else {
+      dieIndex++;
+      System.out.println(nMoves);
+    }
   }
 
   void prepareBeforeRoll() {
