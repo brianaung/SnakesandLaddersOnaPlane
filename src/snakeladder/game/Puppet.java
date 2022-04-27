@@ -15,6 +15,7 @@ public class Puppet extends Actor
   private boolean isAuto;
   private String puppetName;
 
+  // track the number of moves performed by each puppet at each time
   private int nMoves = 0;
 
   Puppet(GamePane gp, NavigationPane np, String puppetImage)
@@ -48,17 +49,20 @@ public class Puppet extends Actor
       setLocation(gamePane.startLocation);
     }
 
+    // move the puppet only after rolling the die for specified time
     nMoves += nbSteps;
-    if (navigationPane.getDieIndex() == navigationPane.getNumberOfDice()) 
-    {
+    if (navigationPane.getDieIndex() == navigationPane.getNumberOfDice()) {
         this.nbSteps = nMoves;
+        gamePane.switchToNextPuppet();
+        // reset counters
         nMoves = 0;
         navigationPane.setDieIndex(1);
     } else {
+        // don't move puppet if player hasn't roll the dice for specified time yet
         this.nbSteps = 0;
         navigationPane.setDieIndex(navigationPane.getDieIndex() + 1);
     }
-    //this.nbSteps = nbSteps;
+
     setActEnabled(true);
   }
 
@@ -170,6 +174,7 @@ public class Puppet extends Actor
         }
       }
     } else if (nbSteps == 0) {
+        // prepare next roll right away if puppet is specified not to move yet
         setActEnabled(false);
         navigationPane.prepareRoll(cellIndex);
     }

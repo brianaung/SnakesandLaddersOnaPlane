@@ -192,14 +192,13 @@ public class NavigationPane extends GameGrid
     return RANDOM_ROLL_TAG;
   }
 
+  // added getters and setters
   public int getNumberOfDice() {
       return numberOfDice;
   }
-
   public int getDieIndex() {
       return dieIndex;
   }
-
   public void setDieIndex(int x) {
     dieIndex = x;
   }
