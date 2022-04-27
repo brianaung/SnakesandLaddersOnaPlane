@@ -85,7 +85,6 @@ public class NavigationPane extends GameGrid
   // attributes added
   private int numberOfDice;
   private int dieIndex = 1;  // curr number of die each player is rolling
-  private int nMoves = 0;
 
   NavigationPane(Properties properties)
   {
@@ -193,6 +192,18 @@ public class NavigationPane extends GameGrid
     return RANDOM_ROLL_TAG;
   }
 
+  public int getNumberOfDice() {
+      return numberOfDice;
+  }
+
+  public int getDieIndex() {
+      return dieIndex;
+  }
+
+  public void setDieIndex(int x) {
+    dieIndex = x;
+  }
+
   void createGui()
   {
     addActor(new Actor("sprites/dieboard.gif"), dieBoardLocation);
@@ -291,6 +302,7 @@ public class NavigationPane extends GameGrid
       showStatus("Done. Click the hand!");
       String result = gp.getPuppet().getPuppetName() + " - pos: " + currentIndex;
       showResult(result);
+      // gp.switchToNextPuppet
 
       // System.out.println("current puppet - auto: " + gp.getPuppet().getPuppetName() + "  " + gp.getPuppet().isAuto() );
 
@@ -309,16 +321,7 @@ public class NavigationPane extends GameGrid
     showStatus("Moving...");
     showPips("Pips: " + nb);
     showScore("# Rolls: " + (++nbRolls));
-    nMoves+=nb;
-    if (dieIndex == numberOfDice) {
-      gp.getPuppet().go(nMoves);
-      gp.switchToNextPuppet();
-      nMoves = 0;
-      dieIndex = 1;  // reset
-    } else {
-      dieIndex++;
-      System.out.println(nMoves);
-    }
+    gp.getPuppet().go(nb);
   }
 
   void prepareBeforeRoll() {

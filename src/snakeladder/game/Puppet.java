@@ -15,6 +15,8 @@ public class Puppet extends Actor
   private boolean isAuto;
   private String puppetName;
 
+  private int nMoves = 0;
+
   Puppet(GamePane gp, NavigationPane np, String puppetImage)
   {
     super(puppetImage);
@@ -45,7 +47,18 @@ public class Puppet extends Actor
       cellIndex = 0;
       setLocation(gamePane.startLocation);
     }
-    this.nbSteps = nbSteps;
+
+    nMoves += nbSteps;
+    if (navigationPane.getDieIndex() == navigationPane.getNumberOfDice()) 
+    {
+        this.nbSteps = nMoves;
+        nMoves = 0;
+        navigationPane.setDieIndex(1);
+    } else {
+        this.nbSteps = 0;
+        navigationPane.setDieIndex(navigationPane.getDieIndex() + 1);
+    }
+    //this.nbSteps = nbSteps;
     setActEnabled(true);
   }
 
@@ -156,6 +169,9 @@ public class Puppet extends Actor
           navigationPane.prepareRoll(cellIndex);
         }
       }
+    } else if (nbSteps == 0) {
+        setActEnabled(false);
+        navigationPane.prepareRoll(cellIndex);
     }
   }
 
