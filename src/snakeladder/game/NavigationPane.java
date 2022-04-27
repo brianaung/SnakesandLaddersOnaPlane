@@ -21,7 +21,7 @@ public class NavigationPane extends GameGrid
       {
         Monitor.putSleep();
         handBtn.show(1);
-       roll(getDieValue());
+        roll(getDieValue());
         delay(1000);
         handBtn.show(0);
       }
@@ -82,6 +82,10 @@ public class NavigationPane extends GameGrid
   private java.util.List<java.util.List<Integer>> dieValues = new ArrayList<>();
   private GamePlayCallback gamePlayCallback;
 
+  // attributes added
+  private int numberOfDice;
+  private int dieIndex = 1;  // curr number of die each player is rolling
+
   NavigationPane(Properties properties)
   {
     this.properties = properties;
@@ -89,7 +93,10 @@ public class NavigationPane extends GameGrid
             (properties.getProperty("dice.count") == null)
                     ? 1  // default
                     : Integer.parseInt(properties.getProperty("dice.count"));
-    System.out.println("numberOfDice = " + numberOfDice);
+    // System.out.println("numberOfDice = " + numberOfDice);
+
+    this.numberOfDice = numberOfDice;
+
     isAuto = Boolean.parseBoolean(properties.getProperty("autorun"));
     autoChk = new GGCheckButton("Auto Run", YELLOW, TRANSPARENT, isAuto);
     System.out.println("autorun = " + isAuto);
@@ -283,7 +290,15 @@ public class NavigationPane extends GameGrid
       showStatus("Done. Click the hand!");
       String result = gp.getPuppet().getPuppetName() + " - pos: " + currentIndex;
       showResult(result);
-      gp.switchToNextPuppet();
+
+      // do not switch to the next puppet until the player has rolled the dice the specified amount of time
+      if (dieIndex == numberOfDice) {
+        gp.switchToNextPuppet();
+        dieIndex = 1;  // reset
+      } else {
+        dieIndex++;
+      }
+
       // System.out.println("current puppet - auto: " + gp.getPuppet().getPuppetName() + "  " + gp.getPuppet().isAuto() );
 
       if (isAuto) {
