@@ -15,14 +15,19 @@ public class Puppet extends Actor
   private boolean isAuto;
   private String puppetName;
 
-  // track the number of moves performed by each puppet at each time
+  // Added variables
+  // Track the number of moves performed by each puppet at each time
   private int nMoves = 0;
+  private int numberOfDice;
+  // Total moves per turn
+  private int turnMoves = 0;
 
   Puppet(GamePane gp, NavigationPane np, String puppetImage)
   {
     super(puppetImage);
     this.gamePane = gp;
     this.navigationPane = np;
+    this.numberOfDice = np.getNumberOfDice();
   }
 
   public boolean isAuto() {
@@ -41,7 +46,7 @@ public class Puppet extends Actor
     this.puppetName = puppetName;
   }
 
-  void go(int nbSteps)
+  void go(int nb)
   {
     if (cellIndex == 100)  // after game over
     {
@@ -49,17 +54,17 @@ public class Puppet extends Actor
       setLocation(gamePane.startLocation);
     }
 
-    // move the puppet only after rolling the die for specified time
-    nMoves += nbSteps;
+    // Move the puppet only after rolling the die for specified time
+    nMoves += nb;
+    System.out.println("nMoves = " + nMoves);
+    System.out.println("DieIndex = " + navigationPane.getDieIndex());
+
     if (navigationPane.getDieIndex() == navigationPane.getNumberOfDice()) {
-        this.nbSteps = nMoves;
-        gamePane.switchToNextPuppet();
-        // reset counters
-        nMoves = 0;
-        navigationPane.setDieIndex(1);
+        nbSteps = nMoves;
+        endTurn();
     } else {
-        // don't move puppet if player hasn't roll the dice for specified time yet
-        this.nbSteps = 0;
+        // Don't move puppet if player hasn't rolled the dice for specified time yet
+        nbSteps = 0;
         navigationPane.setDieIndex(navigationPane.getDieIndex() + 1);
     }
 
@@ -143,8 +148,9 @@ public class Puppet extends Actor
         navigationPane.prepareRoll(cellIndex);
         return;
       }
-
       nbSteps--;
+
+      // After finish moving, determine if puppet is on a connection
       if (nbSteps == 0)
       {
         // Check if on connection start
@@ -152,10 +158,19 @@ public class Puppet extends Actor
         {
           gamePane.setSimulationPeriod(50);
           y = gamePane.toPoint(currentCon.locStart).y;
-          if (currentCon.locEnd.y > currentCon.locStart.y)
-            dy = gamePane.animationStep;
-          else
+          if (currentCon.locEnd.y > currentCon.locStart.y) {
+            // Connection is Snake
+            if (turnMoves != numberOfDice) {
+              dy = gamePane.animationStep;
+            } else {
+              currentCon = null;
+              navigationPane.prepareRoll(cellIndex);
+            }
+          }
+          else {
+            // Connection is Ladder
             dy = -gamePane.animationStep;
+          }
           if (currentCon instanceof Snake)
           {
             navigationPane.showStatus("Digesting...");
@@ -178,6 +193,15 @@ public class Puppet extends Actor
         setActEnabled(false);
         navigationPane.prepareRoll(cellIndex);
     }
+  }
+
+  // Used to reset all turn variables
+  private void endTurn() {
+    gamePane.switchToNextPuppet();
+    // Reset counters
+    turnMoves = nMoves;
+    nMoves = 0;
+    navigationPane.setDieIndex(1);
   }
 
 }

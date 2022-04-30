@@ -84,7 +84,7 @@ public class NavigationPane extends GameGrid
 
   // attributes added
   private int numberOfDice;
-  private int dieIndex = 1;  // curr number of die each player is rolling
+  private int dieIndex = 1;  // Curr index of die each player is rolling
 
   NavigationPane(Properties properties)
   {
@@ -93,7 +93,7 @@ public class NavigationPane extends GameGrid
             (properties.getProperty("dice.count") == null)
                     ? 1  // default
                     : Integer.parseInt(properties.getProperty("dice.count"));
-    // System.out.println("numberOfDice = " + numberOfDice);
+    System.out.println("numberOfDice = " + numberOfDice);
 
     this.numberOfDice = numberOfDice;
 
