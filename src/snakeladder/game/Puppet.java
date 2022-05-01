@@ -68,6 +68,7 @@ public class Puppet extends Actor
       navigationPane.setDieIndex(navigationPane.getDieIndex() + 1);
     }
 
+    // need to run act() even if puppet dont need to move to prepare next roll
     setActEnabled(true);
   }
 
@@ -85,21 +86,42 @@ public class Puppet extends Actor
   {
     int tens = cellIndex / 10;
     int ones = cellIndex - tens * 10;
-    if (tens % 2 == 0)     // Cells starting left 01, 21, .. 81
-    {
+    if (tens % 2 == 0) {
+      // Cells starting left 01, 21, .. 81
       if (ones == 0 && cellIndex > 0)
         setLocation(new Location(getX(), getY() - 1));
       else
         setLocation(new Location(getX() + 1, getY()));
     }
-    else     // Cells starting left 20, 40, .. 100
-    {
+    else {
+      // Cells starting left 20, 40, .. 100
       if (ones == 0)
         setLocation(new Location(getX(), getY() - 1));
       else
         setLocation(new Location(getX() - 1, getY()));
     }
     cellIndex++;
+  }
+
+  private void moveToPrevCell()
+  {
+    int tens = cellIndex / 10;
+    int ones = cellIndex - tens * 10;
+    if (tens % 2 == 0) {
+      // Cells starting left 01, 21, .. 81
+      if (ones == 0 && cellIndex > 0)
+        setLocation(new Location(getX(), getY() + 1));
+      else
+        setLocation(new Location(getX() - 1, getY()));
+    }
+    else {
+      // Cells starting left 20, 40, .. 100
+      if (ones == 0)
+        setLocation(new Location(getX(), getY() + 1));
+      else
+        setLocation(new Location(getX() + 1, getY()));
+    }
+    cellIndex--;
   }
 
   public void act()
@@ -153,6 +175,23 @@ public class Puppet extends Actor
       // After finish moving, determine if puppet is on a connection
       if (nbSteps == 0)
       {
+
+        // TODO: should implement task 3 here?
+        // below code's not fully working
+        // int prevPuppetIndex = gamePane.getCurrentPuppetIndex();
+        // int prevPuppetCell = gamePane.getAllPuppets().get(prevPuppetIndex).getCellIndex();
+        // int currPuppetCell = this.cellIndex;
+        // Puppet prevPuppet = (gamePane.getAllPuppets()).get(prevPuppetIndex);
+        //
+        // System.out.println("curr cell index:" + currPuppetCell);
+        // System.out.println("prev cell index:" + prevPuppetCell);
+        // System.out.println("prev puppet index:" + prevPuppetIndex);
+        //
+        // if (currPuppetCell == prevPuppetCell) {
+        //   prevPuppet.moveToPrevCell();
+        //   return;
+        // }
+
         // Check if on connection start
         if ((currentCon = gamePane.getConnectionAt(getLocation())) != null)
         {
