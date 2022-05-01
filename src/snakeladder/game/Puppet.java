@@ -46,7 +46,7 @@ public class Puppet extends Actor
     this.puppetName = puppetName;
   }
 
-  void go(int nb)
+  void go(int nbSteps)
   {
     if (cellIndex == 100)  // after game over
     {
@@ -54,18 +54,18 @@ public class Puppet extends Actor
       setLocation(gamePane.startLocation);
     }
 
-    // Move the puppet only after rolling the die for specified time
-    nMoves += nb;
-    System.out.println("nMoves = " + nMoves);
-    System.out.println("DieIndex = " + navigationPane.getDieIndex());
-
+    // allow player to roll multiple dice (based on specified numberOfDice) 
+    // before moving the puppet
+    nMoves += nbSteps;
+    // System.out.println("nMoves = " + nMoves);
+    // System.out.println("DieIndex = " + navigationPane.getDieIndex());
     if (navigationPane.getDieIndex() == navigationPane.getNumberOfDice()) {
-        nbSteps = nMoves;
-        endTurn();
+      this.nbSteps = nMoves;
+      endTurn();
     } else {
-        // Don't move puppet if player hasn't rolled the dice for specified time yet
-        nbSteps = 0;
-        navigationPane.setDieIndex(navigationPane.getDieIndex() + 1);
+      // Don't move puppet if player hasn't rolled the dice for specified time yet
+      this.nbSteps = 0;
+      navigationPane.setDieIndex(navigationPane.getDieIndex() + 1);
     }
 
     setActEnabled(true);
@@ -171,13 +171,12 @@ public class Puppet extends Actor
             // Connection is Ladder
             dy = -gamePane.animationStep;
           }
-          if (currentCon instanceof Snake)
-          {
+          if (currentCon instanceof Snake) {
             navigationPane.showStatus("Digesting...");
             navigationPane.playSound(GGSound.MMM);
-          }
-          else
-          {
+          } else if (currentCon == null) {
+            // connection is snaked but does not digest
+          } else {
             navigationPane.showStatus("Climbing...");
             navigationPane.playSound(GGSound.BOING);
           }
