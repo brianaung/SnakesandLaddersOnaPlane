@@ -82,9 +82,9 @@ public class NavigationPane extends GameGrid
   private java.util.List<java.util.List<Integer>> dieValues = new ArrayList<>();
   private GamePlayCallback gamePlayCallback;
 
-  // attributes added
   private int numberOfDice;
-  private int dieIndex = 1;  // Curr index of die each player is rolling
+  // Curr index of die each player is rolling
+  private int dieIndex = 1;  
 
   NavigationPane(Properties properties)
   {
@@ -192,7 +192,6 @@ public class NavigationPane extends GameGrid
     return RANDOM_ROLL_TAG;
   }
 
-  // added getters and setters
   public int getNumberOfDice() {
       return numberOfDice;
   }
@@ -301,7 +300,6 @@ public class NavigationPane extends GameGrid
       showStatus("Done. Click the hand!");
       String result = gp.getPuppet().getPuppetName() + " - pos: " + currentIndex;
       showResult(result);
-      // gp.switchToNextPuppet
 
       // System.out.println("current puppet - auto: " + gp.getPuppet().getPuppetName() + "  " + gp.getPuppet().isAuto() );
 

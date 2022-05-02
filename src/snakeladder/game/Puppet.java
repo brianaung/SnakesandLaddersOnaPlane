@@ -15,8 +15,6 @@ public class Puppet extends Actor
   // used to animate movement on connections
   private int y;
   private int dy;
-
-  // Added variables
   // Track the number of moves performed by each puppet at each time
   private int nMoves = 0;
   private int numberOfDice;
@@ -47,8 +45,8 @@ public class Puppet extends Actor
     this.puppetName = puppetName;
   }
 
-  void go(int nb)
-  {
+  // calculate the total number of steps a puppet should move
+  void go(int nb) {
     if (cellIndex == 100)  // after game over
     {
       cellIndex = 0;
@@ -58,11 +56,10 @@ public class Puppet extends Actor
     // allow player to roll multiple dice (based on specified numberOfDice) 
     // before moving the puppet
     nMoves += nb;
-    // System.out.println("nMoves = " + nMoves);
-    // System.out.println("DieIndex = " + navigationPane.getDieIndex());
     if (navigationPane.getDieIndex() == navigationPane.getNumberOfDice()) {
       nbSteps = nMoves;
       endTurn();
+      setActEnabled(true);
     } else {
       // Don't move puppet if player hasn't rolled the dice for specified time yet
       // Prepare to do next roll right away (do not `act()`)
@@ -70,8 +67,6 @@ public class Puppet extends Actor
       navigationPane.prepareRoll(cellIndex);
       setActEnabled(false);
     }
-
-    setActEnabled(true);
   }
 
   void resetToStartingPoint() {
@@ -113,20 +108,16 @@ public class Puppet extends Actor
     if ((cellIndex % 10 == 1) && (cellIndex != 1)) {
       // for cells ending with '1' go down one cell
       setLocation(new Location(getX(), getY() + 1));
-
     } else if (tens % 2 == 0) {
       // row goes left to right
-      
       if (ones == 0) {
         // last cell in row
         setLocation(new Location(getX() + 1, getY()));
       } else {
         setLocation(new Location(getX() - 1, getY()));
       }
-
     } else if (tens % 2 != 0) {
       // row goes right to left
-
       if (ones == 0) {
         // last cell in row
         setLocation(new Location(getX() - 1, getY()));
@@ -154,7 +145,6 @@ public class Puppet extends Actor
 
     // Normal movement
     if (nbSteps > 0) {
-
       moveToNextCell();
 
       // Game over case
@@ -207,8 +197,9 @@ public class Puppet extends Actor
     navigationPane.setDieIndex(1);
   }
 
+  // check the connection and prepare attributes for 
+  // animating movement on connection
   private void prepareAtConnection() {
-
     gamePane.setSimulationPeriod(50);
     y = gamePane.toPoint(currentCon.locStart).y;
 
@@ -233,11 +224,10 @@ public class Puppet extends Actor
       navigationPane.showStatus("Climbing...");
       navigationPane.playSound(GGSound.BOING);
     }
-
   }
 
+  // move the puppet alongside connection (if not null) one step
   private void animateOnConnection() {
-
     int x = gamePane.x(y, currentCon);
     setPixelLocation(new Point(x, y));
     y += dy;
@@ -255,5 +245,4 @@ public class Puppet extends Actor
       navigationPane.prepareRoll(cellIndex);
     }
   }
-
 }
