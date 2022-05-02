@@ -10,10 +10,12 @@ public class Puppet extends Actor
   private int cellIndex = 0;
   private int nbSteps;
   private Connection currentCon = null;
-  private int y;
-  private int dy;
   private boolean isAuto;
   private String puppetName;
+  // used to animate movement on connections
+  private int y;
+  private int dy;
+
 
   // Added variables
   // Track the number of moves performed by each puppet at each time
@@ -46,7 +48,7 @@ public class Puppet extends Actor
     this.puppetName = puppetName;
   }
 
-  void go(int nbSteps)
+  void go(int nb)
   {
     if (cellIndex == 100)  // after game over
     {
@@ -56,19 +58,20 @@ public class Puppet extends Actor
 
     // allow player to roll multiple dice (based on specified numberOfDice) 
     // before moving the puppet
-    nMoves += nbSteps;
+    nMoves += nb;
     // System.out.println("nMoves = " + nMoves);
     // System.out.println("DieIndex = " + navigationPane.getDieIndex());
     if (navigationPane.getDieIndex() == navigationPane.getNumberOfDice()) {
-      this.nbSteps = nMoves;
+      nbSteps = nMoves;
       endTurn();
     } else {
       // Don't move puppet if player hasn't rolled the dice for specified time yet
-      this.nbSteps = 0;
+      // Prepare to do next roll right away (do not `act()`)
       navigationPane.setDieIndex(navigationPane.getDieIndex() + 1);
+      navigationPane.prepareRoll(cellIndex);
+      setActEnabled(false);
     }
 
-    // need to run act() even if puppet dont need to move to prepare next roll
     setActEnabled(true);
   }
 
@@ -140,22 +143,7 @@ public class Puppet extends Actor
     // Animation: Move on connection
     if (currentCon != null)
     {
-      int x = gamePane.x(y, currentCon);
-      setPixelLocation(new Point(x, y));
-      y += dy;
-
-      // Check end of connection
-      if ((dy > 0 && (y - gamePane.toPoint(currentCon.locEnd).y) > 0)
-        || (dy < 0 && (y - gamePane.toPoint(currentCon.locEnd).y) < 0))
-      {
-        gamePane.setSimulationPeriod(100);
-        setActEnabled(false);
-        setLocation(currentCon.locEnd);
-        cellIndex = currentCon.cellEnd;
-        setLocationOffset(new Point(0, 0));
-        currentCon = null;
-        navigationPane.prepareRoll(cellIndex);
-      }
+      animateOnConnection();
       return;
     }
 
@@ -195,30 +183,7 @@ public class Puppet extends Actor
         // Check if on connection start
         if ((currentCon = gamePane.getConnectionAt(getLocation())) != null)
         {
-          gamePane.setSimulationPeriod(50);
-          y = gamePane.toPoint(currentCon.locStart).y;
-          if (currentCon.locEnd.y > currentCon.locStart.y) {
-            // Connection is Snake
-            if (turnMoves != numberOfDice) {
-              dy = gamePane.animationStep;
-            } else {
-              currentCon = null;
-              navigationPane.prepareRoll(cellIndex);
-            }
-          }
-          else {
-            // Connection is Ladder
-            dy = -gamePane.animationStep;
-          }
-          if (currentCon instanceof Snake) {
-            navigationPane.showStatus("Digesting...");
-            navigationPane.playSound(GGSound.MMM);
-          } else if (currentCon == null) {
-            // connection is snaked but does not digest
-          } else {
-            navigationPane.showStatus("Climbing...");
-            navigationPane.playSound(GGSound.BOING);
-          }
+          prepareAtConnection();
         }
         else
         {
@@ -226,10 +191,6 @@ public class Puppet extends Actor
           navigationPane.prepareRoll(cellIndex);
         }
       }
-    } else if (nbSteps == 0) {
-        // prepare next roll right away if puppet is specified not to move yet
-        setActEnabled(false);
-        navigationPane.prepareRoll(cellIndex);
     }
   }
 
@@ -240,6 +201,54 @@ public class Puppet extends Actor
     turnMoves = nMoves;
     nMoves = 0;
     navigationPane.setDieIndex(1);
+  }
+
+  private void prepareAtConnection() {
+
+    gamePane.setSimulationPeriod(50);
+    y = gamePane.toPoint(currentCon.locStart).y;
+
+    if (currentCon.locEnd.y > currentCon.locStart.y) {
+      // Connection is Snake
+      if (turnMoves != numberOfDice) {
+        dy = gamePane.animationStep;
+      } else {
+        // do not digest if total moves == number of dice rolled
+        currentCon = null;
+        navigationPane.prepareRoll(cellIndex);
+      }
+    } else {
+      // Connection is Ladder
+      dy = -gamePane.animationStep;
+    }
+
+    if (currentCon instanceof Snake) {
+      navigationPane.showStatus("Digesting...");
+      navigationPane.playSound(GGSound.MMM);
+    } else if (currentCon instanceof Ladder) {
+      navigationPane.showStatus("Climbing...");
+      navigationPane.playSound(GGSound.BOING);
+    }
+
+  }
+
+  private void animateOnConnection() {
+    int x = gamePane.x(y, currentCon);
+    setPixelLocation(new Point(x, y));
+    y += dy;
+
+    // Check end of connection
+    if ((dy > 0 && (y - gamePane.toPoint(currentCon.locEnd).y) > 0)
+      || (dy < 0 && (y - gamePane.toPoint(currentCon.locEnd).y) < 0))
+    {
+      gamePane.setSimulationPeriod(100);
+      setActEnabled(false);
+      setLocation(currentCon.locEnd);
+      cellIndex = currentCon.cellEnd;
+      setLocationOffset(new Point(0, 0));
+      currentCon = null;
+      navigationPane.prepareRoll(cellIndex);
+    }
   }
 
 }
