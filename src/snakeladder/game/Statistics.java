@@ -30,12 +30,24 @@ public class Statistics {
         return traversedDown;
     }
 
-    @Override
-    public String toString() {
-        return "Statistics{" +
-                "traversedUp=" + traversedUp +
-                ", traversedDown=" + traversedDown +
-                ", playerRolls=" + playerRolls +
-                '}';
+    public String toRolledString() {
+        String rolledOutput = " rolled: ";
+        ArrayList<String> rolled = new ArrayList<String>();
+        Set set = playerRolls.entrySet();
+        Iterator it = set.iterator();
+        while(it.hasNext()) {
+            Map.Entry entry = (Map.Entry) it.next();
+            rolled.add(entry.getKey() + "-" + entry.getValue() + " ");
+        }
+        Collections.reverse(rolled);
+        for (int i=0; i<rolled.size(); i++) {
+            rolledOutput += rolled.get(i);
+        }
+        return rolledOutput;
+    }
+
+    public String toTraversedString() {
+        String traversedOutput = " traversed: up-" + traversedUp + " down-" + traversedDown;
+        return traversedOutput;
     }
 }

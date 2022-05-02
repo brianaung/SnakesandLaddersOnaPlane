@@ -7,6 +7,7 @@ import snakeladder.game.custom.CustomGGButton;
 import snakeladder.utility.ServicesRandom;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 @SuppressWarnings("serial")
@@ -287,6 +288,15 @@ public class NavigationPane extends GameGrid
       showResult("Game over");
       isGameOver = true;
       handBtn.setEnabled(true);
+
+      List<Puppet> puppets = gp.getAllPuppets();
+      for (int i=0;i<puppets.size();i++) {
+        Puppet currPuppet = puppets.get(i);
+        // Print player rolled statistics
+        System.out.println(currPuppet.getPuppetName() + currPuppet.getStats().toRolledString());
+        // Print player traversed statistics
+        System.out.println(currPuppet.getPuppetName() + currPuppet.getStats().toTraversedString());
+      }
 
       java.util.List  <String> playerPositions = new ArrayList<>();
       for (Puppet puppet: gp.getAllPuppets()) {

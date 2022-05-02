@@ -22,6 +22,7 @@ public class Puppet extends Actor
   private int numberOfDice;
   // Total moves per turn
   private int turnMoves = 0;
+  private Statistics stats;
 
   Puppet(GamePane gp, NavigationPane np, String puppetImage)
   {
@@ -29,6 +30,7 @@ public class Puppet extends Actor
     this.gamePane = gp;
     this.navigationPane = np;
     this.numberOfDice = np.getNumberOfDice();
+    this.stats = new Statistics();
   }
 
   public boolean isAuto() {
@@ -51,6 +53,8 @@ public class Puppet extends Actor
   {
     if (cellIndex == 100)  // after game over
     {
+      System.out.println(puppetName + stats.toRolledString());
+      System.out.println(puppetName + stats.toTraversedString());
       cellIndex = 0;
       setLocation(gamePane.startLocation);
     }
@@ -62,6 +66,8 @@ public class Puppet extends Actor
     // System.out.println("DieIndex = " + navigationPane.getDieIndex());
     if (navigationPane.getDieIndex() == navigationPane.getNumberOfDice()) {
       nbSteps = nMoves;
+      stats.getPlayerRolls().putIfAbsent(nMoves, 0);
+      stats.getPlayerRolls().put(nMoves, stats.getPlayerRolls().get(nMoves) + 1);
       endTurn();
     } else {
       // Don't move puppet if player hasn't rolled the dice for specified time yet
@@ -70,7 +76,6 @@ public class Puppet extends Actor
       navigationPane.prepareRoll(cellIndex);
       setActEnabled(false);
     }
-
     setActEnabled(true);
   }
 
@@ -82,6 +87,10 @@ public class Puppet extends Actor
 
   int getCellIndex() {
     return cellIndex;
+  }
+
+  public Statistics getStats() {
+    return stats;
   }
 
   private void moveToNextCell()
@@ -216,6 +225,7 @@ public class Puppet extends Actor
       // Connection is Snake
       if (turnMoves != numberOfDice) {
         dy = gamePane.animationStep;
+        stats.addTraversedDown();
       } else {
         // do not digest if total moves == number of dice rolled
         currentCon = null;
@@ -224,6 +234,7 @@ public class Puppet extends Actor
     } else {
       // Connection is Ladder
       dy = -gamePane.animationStep;
+      stats.addTraversedUp();
     }
 
     if (currentCon instanceof Snake) {
