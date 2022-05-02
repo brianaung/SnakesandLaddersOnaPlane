@@ -16,7 +16,6 @@ public class Puppet extends Actor
   private int y;
   private int dy;
 
-
   // Added variables
   // Track the number of moves performed by each puppet at each time
   private int nMoves = 0;
@@ -110,59 +109,65 @@ public class Puppet extends Actor
   {
     int tens = cellIndex / 10;
     int ones = cellIndex - tens * 10;
-    if (tens % 2 == 0) {
-      // Cells starting left 01, 21, .. 81
-      if (ones == 0 && cellIndex > 0)
-        setLocation(new Location(getX(), getY() + 1));
-      else
-        setLocation(new Location(getX() - 1, getY()));
-    }
-    else {
-      // Cells starting left 20, 40, .. 100
-      if (ones == 0)
-        setLocation(new Location(getX(), getY() + 1));
-      else
+
+    if ((cellIndex % 10 == 1) && (cellIndex != 1)) {
+      // for cells ending with '1' go down one cell
+      setLocation(new Location(getX(), getY() + 1));
+
+    } else if (tens % 2 == 0) {
+      // row goes left to right
+      
+      if (ones == 0) {
+        // last cell in row
         setLocation(new Location(getX() + 1, getY()));
+      } else {
+        setLocation(new Location(getX() - 1, getY()));
+      }
+
+    } else if (tens % 2 != 0) {
+      // row goes right to left
+
+      if (ones == 0) {
+        // last cell in row
+        setLocation(new Location(getX() - 1, getY()));
+      } else {
+        setLocation(new Location(getX() + 1, getY()));
+      }
     }
+
     cellIndex--;
   }
 
   public void act()
   {
-    if ((cellIndex / 10) % 2 == 0)
-    {
-      if (isHorzMirror())
-        setHorzMirror(false);
+    if ((cellIndex / 10) % 2 == 0) {
+      if (isHorzMirror()) { setHorzMirror(false); }
+    } else {
+      if (!isHorzMirror()) { setHorzMirror(true); }
     }
-    else
-    {
-      if (!isHorzMirror())
-        setHorzMirror(true);
-    }
-
+    
     // Animation: Move on connection
-    if (currentCon != null)
-    {
+    if (currentCon != null) {
       animateOnConnection();
       return;
     }
 
     // Normal movement
-    if (nbSteps > 0)
-    {
+    if (nbSteps > 0) {
+
       moveToNextCell();
 
-      if (cellIndex == 100)  // Game over
-      {
+      // Game over case
+      if (cellIndex == 100)  {
         setActEnabled(false);
         navigationPane.prepareRoll(cellIndex);
         return;
       }
+
       nbSteps--;
 
       // After finish moving, determine if puppet is on a connection
-      if (nbSteps == 0)
-      {
+      if (nbSteps == 0) {
 
         // TODO: should implement task 3 here?
         // below code's not fully working
@@ -181,12 +186,9 @@ public class Puppet extends Actor
         // }
 
         // Check if on connection start
-        if ((currentCon = gamePane.getConnectionAt(getLocation())) != null)
-        {
+        if ((currentCon = gamePane.getConnectionAt(getLocation())) != null) {
           prepareAtConnection();
-        }
-        else
-        {
+        } else {
           setActEnabled(false);
           navigationPane.prepareRoll(cellIndex);
         }
@@ -233,6 +235,7 @@ public class Puppet extends Actor
   }
 
   private void animateOnConnection() {
+
     int x = gamePane.x(y, currentCon);
     setPixelLocation(new Point(x, y));
     y += dy;
