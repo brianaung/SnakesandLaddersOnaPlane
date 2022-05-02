@@ -169,21 +169,23 @@ public class Puppet extends Actor
       // After finish moving, determine if puppet is on a connection
       if (nbSteps == 0) {
 
-        // TODO: should implement task 3 here?
-        // below code's not fully working
-        // int prevPuppetIndex = gamePane.getCurrentPuppetIndex();
-        // int prevPuppetCell = gamePane.getAllPuppets().get(prevPuppetIndex).getCellIndex();
-        // int currPuppetCell = this.cellIndex;
-        // Puppet prevPuppet = (gamePane.getAllPuppets()).get(prevPuppetIndex);
-        //
-        // System.out.println("curr cell index:" + currPuppetCell);
-        // System.out.println("prev cell index:" + prevPuppetCell);
-        // System.out.println("prev puppet index:" + prevPuppetIndex);
-        //
-        // if (currPuppetCell == prevPuppetCell) {
-        //   prevPuppet.moveToPrevCell();
-        //   return;
-        // }
+        // check if puppet fall on the same cell as opponent
+        int prevPuppetIndex = gamePane.getCurrentPuppetIndex();
+        int prevPuppetCell = gamePane.getAllPuppets().get(prevPuppetIndex).getCellIndex();
+        int currPuppetCell = this.cellIndex;
+        Puppet prevPuppet = (gamePane.getAllPuppets()).get(prevPuppetIndex);
+        if (currPuppetCell == prevPuppetCell) {
+          prevPuppet.moveToPrevCell(); // move opponent puppet one cell back
+
+          // if opponent fall on to the cell that has connection
+          if ((prevPuppet.currentCon = gamePane.getConnectionAt(prevPuppet.getLocation())) != null) {
+            prevPuppet.prepareAtConnection();
+            // animate movement till the connection end
+            while (prevPuppet.currentCon != null) {
+              prevPuppet.animateOnConnection();
+            }
+          }
+        }
 
         // Check if on connection start
         if ((currentCon = gamePane.getConnectionAt(getLocation())) != null) {
