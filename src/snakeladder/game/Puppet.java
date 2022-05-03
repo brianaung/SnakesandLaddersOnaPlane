@@ -175,6 +175,7 @@ public class Puppet extends Actor
         int prevPuppetIndex = gamePane.getCurrentPuppetIndex();
         int prevPuppetCell = gamePane.getAllPuppets().get(prevPuppetIndex).getCellIndex();
         int currPuppetCell = this.cellIndex;
+        decideToggle(prevPuppetCell);
         Puppet prevPuppet = (gamePane.getAllPuppets()).get(prevPuppetIndex);
         if (currPuppetCell == prevPuppetCell) {
           prevPuppet.moveToPrevCell(); // move opponent puppet one cell back
@@ -277,4 +278,46 @@ public class Puppet extends Actor
       navigationPane.prepareRoll(cellIndex);
     }
   }
+
+  private void decideToggle(int prevPuppetCell) {
+
+    // Total upward connections
+    int nUpConn=0;
+    // Total downward connections
+    int nDownConn=0;
+
+    // Check prevPuppets every possible roll for next round
+    for (int i=numberOfDice; i<=numberOfDice*6; i++) {
+      int checkCell = prevPuppetCell + i;
+      Location checkLoc = GamePane.cellToLocation(checkCell);
+      Connection checkConn = gamePane.getConnectionAt(checkLoc, navigationPane.isToggle());
+      // Check for connection type
+      if (checkConn != null) {
+        if (!navigationPane.isToggle()) {
+          // Normal Mode
+          if (checkConn instanceof Ladder) {
+            nUpConn++;
+          } else {
+            nDownConn++;
+          }
+        } else {
+          // Reverse Mode
+          if (checkConn instanceof Snake) {
+            nUpConn++;
+          } else {
+            nDownConn++;
+          }
+        }
+        // System.out.println("cellStart = " + checkConn.cellStart + " cellEnd = " + checkConn.cellEnd);
+      }
+    }
+    // If there are more upward paths than downwards reverse connections
+    if (nUpConn > nDownConn) {
+      navigationPane.setToggle(true);
+    } else {
+      navigationPane.setToggle(false);
+    }
+    // System.out.println("nUp = " + nUpConn + " nDown = " + nDownConn + " Toggle = " + navigationPane.isToggle());
+  }
+
 }
