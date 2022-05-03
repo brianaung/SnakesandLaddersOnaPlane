@@ -5,10 +5,11 @@ import java.util.*;
 public class Statistics {
     private int traversedUp=0;
     private int traversedDown=0;
-    private Hashtable<Integer,Integer> playerRolls;
+    // Tree map is a sorted Dictionary
+    private TreeMap<Integer,Integer> playerRolls;
 
     public Statistics() {
-        playerRolls = new Hashtable<>();
+        playerRolls = new TreeMap<>();
     }
 
     public void addTraversedUp() {
@@ -18,7 +19,7 @@ public class Statistics {
         traversedDown++;
     }
 
-    public Hashtable<Integer, Integer> getPlayerRolls() {
+    public TreeMap<Integer, Integer> getPlayerRolls() {
         return playerRolls;
     }
 
@@ -32,17 +33,18 @@ public class Statistics {
 
     public String toRolledString() {
         String rolledOutput = " rolled: ";
-        ArrayList<String> rolled = new ArrayList<String>();
+        //ArrayList<String> rolled = new ArrayList<String>();
         Set set = playerRolls.entrySet();
         Iterator it = set.iterator();
         while(it.hasNext()) {
             Map.Entry entry = (Map.Entry) it.next();
-            rolled.add(entry.getKey() + "-" + entry.getValue() + " ");
+            rolledOutput += entry.getKey() + "-" + entry.getValue() + " ";
+            //rolled.add(entry.getKey() + "-" + entry.getValue() + " ");
         }
-        Collections.reverse(rolled);
-        for (int i=0; i<rolled.size(); i++) {
-            rolledOutput += rolled.get(i);
-        }
+//        Collections.reverse(rolled);
+//        for (int i=0; i<rolled.size(); i++) {
+//            rolledOutput += rolled.get(i);
+//        }
         return rolledOutput;
     }
 

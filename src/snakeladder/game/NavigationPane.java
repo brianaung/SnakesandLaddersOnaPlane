@@ -287,15 +287,8 @@ public class NavigationPane extends GameGrid
       showResult("Game over");
       isGameOver = true;
       handBtn.setEnabled(true);
-
-      List<Puppet> puppets = gp.getAllPuppets();
-      for (int i=0;i<puppets.size();i++) {
-        Puppet currPuppet = puppets.get(i);
-        // Print player rolled statistics
-        System.out.println(currPuppet.getPuppetName() + currPuppet.getStats().toRolledString());
-        // Print player traversed statistics
-        System.out.println(currPuppet.getPuppetName() + currPuppet.getStats().toTraversedString());
-      }
+      // Print stats of all players after Game Over
+      printStats();
 
       java.util.List  <String> playerPositions = new ArrayList<>();
       for (Puppet puppet: gp.getAllPuppets()) {
@@ -371,5 +364,17 @@ public class NavigationPane extends GameGrid
 
   public void checkAuto() {
     if (isAuto) Monitor.wakeUp();
+  }
+
+  // Function to print Stats for all Players
+  private void printStats() {
+    List<Puppet> puppets = gp.getAllPuppets();
+    for (int i=0;i<puppets.size();i++) {
+      Puppet currPuppet = puppets.get(i);
+      // Print player rolled statistics
+      System.out.println(currPuppet.getPuppetName() + currPuppet.getStats().toRolledString());
+      // Print player traversed statistics
+      System.out.println(currPuppet.getPuppetName() + currPuppet.getStats().toTraversedString());
+    }
   }
 }
