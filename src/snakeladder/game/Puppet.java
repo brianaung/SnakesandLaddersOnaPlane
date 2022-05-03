@@ -21,6 +21,7 @@ public class Puppet extends Actor
   // Total moves per turn
   private int turnMoves = 0;
   private Statistics stats;
+  private Boolean reverse;
 
   Puppet(GamePane gp, NavigationPane np, String puppetImage)
   {
@@ -140,6 +141,8 @@ public class Puppet extends Actor
 
   public void act()
   {
+    this.reverse = navigationPane.isToggle();
+
     if ((cellIndex / 10) % 2 == 0) {
       if (isHorzMirror()) { setHorzMirror(false); }
     } else {
@@ -177,7 +180,7 @@ public class Puppet extends Actor
           prevPuppet.moveToPrevCell(); // move opponent puppet one cell back
 
           // if opponent fall on to the cell that has connection
-          if ((prevPuppet.currentCon = gamePane.getConnectionAt(prevPuppet.getLocation())) != null) {
+          if ((prevPuppet.currentCon = gamePane.getConnectionAt(prevPuppet.getLocation(), reverse)) != null) {
             prevPuppet.prepareAtConnection();
             // animate movement till the connection end
             while (prevPuppet.currentCon != null) {
@@ -187,7 +190,7 @@ public class Puppet extends Actor
         }
 
         // Check if on connection start
-        if ((currentCon = gamePane.getConnectionAt(getLocation())) != null) {
+        if ((currentCon = gamePane.getConnectionAt(getLocation(), reverse)) != null) {
           prepareAtConnection();
         } else {
           setActEnabled(false);
@@ -210,6 +213,14 @@ public class Puppet extends Actor
   // animating movement on connection
   private void prepareAtConnection() {
     gamePane.setSimulationPeriod(50);
+
+    // Reverses loc start and end of connections
+    if (reverse) {
+      Location temp = currentCon.locStart;
+      currentCon.locStart = currentCon.locEnd;
+      currentCon.locEnd = temp;
+    }
+
     y = gamePane.toPoint(currentCon.locStart).y;
 
     if (currentCon.locEnd.y > currentCon.locStart.y) {
@@ -229,11 +240,21 @@ public class Puppet extends Actor
     }
 
     if (currentCon instanceof Snake) {
-      navigationPane.showStatus("Digesting...");
-      navigationPane.playSound(GGSound.MMM);
+      if (!reverse) {
+        navigationPane.showStatus("Digesting...");
+        navigationPane.playSound(GGSound.MMM);
+      } else {
+        navigationPane.showStatus("Climbing...");
+        navigationPane.playSound(GGSound.BOING);
+      }
     } else if (currentCon instanceof Ladder) {
-      navigationPane.showStatus("Climbing...");
-      navigationPane.playSound(GGSound.BOING);
+      if (reverse) {
+        navigationPane.showStatus("Digesting...");
+        navigationPane.playSound(GGSound.MMM);
+      } else {
+        navigationPane.showStatus("Climbing...");
+        navigationPane.playSound(GGSound.BOING);
+      }
     }
   }
 

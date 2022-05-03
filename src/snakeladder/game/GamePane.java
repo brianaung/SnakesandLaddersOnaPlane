@@ -96,11 +96,16 @@ public class GamePane extends GameGrid
     return numberOfPlayers;
   }
 
-  Connection getConnectionAt(Location loc)
+  Connection getConnectionAt(Location loc, Boolean reverse)
   {
     for (Connection con : connections)
-      if (con.locStart.equals(loc))
-        return con;
+      if (!reverse) {
+        if (con.locStart.equals(loc))
+          return con;
+      } else {
+        if (con.locEnd.equals(loc))
+          return con;
+      }
     return null;
   }
 

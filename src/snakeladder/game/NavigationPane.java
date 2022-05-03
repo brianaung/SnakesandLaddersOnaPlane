@@ -377,4 +377,12 @@ public class NavigationPane extends GameGrid
       System.out.println(currPuppet.getPuppetName() + currPuppet.getStats().toTraversedString());
     }
   }
+
+  public boolean isToggle() {
+    return isToggle;
+  }
+
+  public void setToggle(boolean toggle) {
+    isToggle = toggle;
+  }
 }
